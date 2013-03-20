@@ -11,11 +11,15 @@ class NetChecks < Sinatra::Base
 # If try to access to root, do redirect => skillstar.com
 # HTTP Response : 302
   get '/' do
-    redirect 'http://www.dotinfra.fr'
+    "Check Box <br/>
+    <hr>
+    - <a href='/checks/pagetest'>Pagetest</a><br/>
+    -- Example : /checks/pagetest?proxy=http://your.proxy&url=http://www.france2.fr/ "
+    #redirect 'http://www.dotinfra.fr'
   end
 
 # Getting JSON serialized return of checks
-  get '/checks' do
+  get '/checks/pagetest' do
     content_type :json
 
     url = "#{params[:url]}"
@@ -34,14 +38,10 @@ class NetChecks < Sinatra::Base
   end
 
 # Define methods
-  def http_code(proxy, url)
-    resp = http_get(URI(proxy), URI(url))
-    resp.code
-  end
   def http_get(proxy,uri)
-    user_agent = 'Mozilla/5.0 (dotINFRA; remote check)'
-    connect = Net::HTTP::Proxy(proxy.host,proxy.port).new(uri.host, uri.port)
-    req = Net::HTTP::Get.new(uri.request_uri, {'User-Agent' => user_agent})
+    user_agent = 'Mozilla/5.0 (Forge; check cache control)'
+    connect = Net::HTTP.new(proxy.host, proxy.port)
+    req = Net::HTTP::Get.new(uri.request_uri, {'Host' => uri.host,'User-Agent' => user_agent})
     req.basic_auth uri.user, uri.password
     resp, data = connect.request(req)
   end
